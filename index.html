@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bavneet's Love App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #FFB6C1;
+            --secondary: #98FB98;
+            --accent: #E6E6FA;
+            --dark: #1a1a2e;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #fef6f9;
+        }
+        .moonlight-theme {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213E 100%);
+            color: white;
+        }
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 1s infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .loading {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--primary);
+            border-top: 4px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .chat-bubble {
+            animation: bounce 0.5s ease;
+        }
+        @keyframes bounce {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+        .water-drop {
+            transition: fill 0.3s ease;
+        }
+        .filled {
+            fill: #4FA1F3;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Auth Section -->
+    <div id="auth-section" class="flex min-h-screen items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+            <h2 class="text-2xl font-bold text-center mb-6 text-pink-500">Welcome Back, Sohniye!</h2>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" id="username" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring focus:ring-pink-200" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring focus:ring-pink-200" required>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="remember" class="rounded text-pink-500">
+                    <label class="ml-2 text-sm text-gray-600">Remember me</label>
+                </div>
+                <button type="submit" class="w-full bg-pink-500 text-white rounded-md py-2 hover:bg-pink-600 transition">Login</button>
+                <p class="text-center text-sm text-gray-600">
+                    <a href="#" class="text-pink-500 hover:text-pink-600">Forgot Password?</a>
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard (Initially Hidden) -->
+    <div id="dashboard" class="hidden">
+        <!-- Navigation -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <h1 class="text-xl font-bold text-pink-500">Meri Jaan ❤️</h1>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100">
+                            <i class="bi bi-moon-stars text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto p-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Period Tracker -->
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-pink-500">
+                        <i class="bi bi-calendar-heart"></i> Period Tracker
+                    </h3>
+                    <div id="period-calendar" class="mb-4"></div>
+                    <div class="flex gap-2 flex-wrap">
+                        <button class="bg-pink-100 text-pink-700 px-4 py-2 rounded-full text-sm">Flow Started</button>
+                        <button class="bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm">Log Symptom</button>
+                    </div>
+                </div>
+
+                <!-- Mood & Affirmations -->
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-purple-500">
+                        <i class="bi bi-emoji-smile"></i> Mood Today
+                    </h3>
+                    <div class="grid grid-cols-3 gap-2 mb-4">
+                        <button class="p-4 bg-yellow-100 rounded-lg text-center hover:bg-yellow-200">
+                            <i class="bi bi-emoji-smile text-2xl"></i>
+                            <p class="text-sm mt-1">Happy</p>
+                        </button>
+                        <button class="p-4 bg-blue-100 rounded-lg text-center hover:bg-blue-200">
+                            <i class="bi bi-emoji-frown text-2xl"></i>
+                            <p class="text-sm mt-1">Sad</p>
+                        </button>
+                        <button class="p-4 bg-red-100 rounded-lg text-center hover:bg-red-200">
+                            <i class="bi bi-emoji-angry text-2xl"></i>
+                            <p class="text-sm mt-1">Stressed</p>
+                        </button>
+                    </div>
+                    <div id="affirmation" class="text-center p-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg">
+                        <p class="italic">"Meri jaan, even clouds can't hide your sunshine."</p>
+                    </div>
+                </div>
+
+                <!-- Bavneet Chatbot -->
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-blue-500">
+                        <i class="bi bi-chat-heart"></i> Talk to Bavneet
+                    </h3>
+                    <div id="chat-container" class="h-80 overflow-y-auto mb-4 p-2">
+                        <div class="chat-bubble bg-blue-100 rounded-lg p-3 mb-2 max-w-[80%]">
+                            Sohniye, tussi aj kiven ho? I've been missing you! 😊
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="chat-input" class="flex-1 border rounded-full px-4 py-2" placeholder="Type a message...">
+                        <button class="bg-blue-500 text-white rounded-full p-2 hover:bg-blue-600">
+                            <i class="bi bi-send"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- To-Do & Gamification -->
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-green-500">
+                        <i class="bi bi-check2-circle"></i> Tasks & Hearts
+                    </h3>
+                    <div class="mb-4">
+                        <p class="text-center text-2xl">❤️ <span id="heart-count">10</span></p>
+                        <p class="text-center text-sm text-gray-600">Current Streak: 3 days</p>
+                    </div>
+                    <div id="task-list" class="space-y-2">
+                        <!-- Tasks will be added here -->
+                    </div>
+                    <button class="mt-4 w-full bg-green-100 text-green-700 rounded-lg py-2 hover:bg-green-200">
+                        Add New Task
+                    </button>
+                </div>
+
+                <!-- Hydration Tracker -->
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-blue-500">
+                        <i class="bi bi-droplet"></i> Hydration Tracker
+                    </h3>
+                    <div id="water-tracker" class="flex justify-center gap-2 mb-4">
+                        <!-- Water cups will be added here -->
+                    </div>
+                    <button class="w-full bg-blue-100 text-blue-700 rounded-lg py-2 hover:bg-blue-200">
+                        Log Water Intake
+                    </button>
+                </div>
+
+                <!-- Journal -->
+                <div class="bg-white rounded-xl shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-purple-500">
+                        <i class="bi bi-journal-text"></i> Today's Journal
+                    </h3>
+                    <p class="text-gray-600 mb-2">What made you smile today?</p>
+                    <textarea class="w-full border rounded-lg p-2 h-24"></textarea>
+                    <div class="flex gap-2 mt-2">
+                        <button class="text-2xl">😊</button>
+                        <button class="text-2xl">❤️</button>
+                        <button class="text-2xl">✨</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Authentication
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if(username === 'tinku' && password === 'iamcute') {
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+            } else {
+                alert('Invalid credentials');
+            }
+        });
+
+        // Theme Toggle
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            document.body.classList.toggle('moonlight-theme');
+            if(document.body.classList.contains('moonlight-theme')) {
+                // Add stars
+                for(let i = 0; i < 50; i++) {
+                    const star = document.createElement('div');
+                    star.classList.add('star');
+                    star.style.left = Math.random() * 100 + 'vw';
+                    star.style.top = Math.random() * 100 + 'vh';
+                    document.body.appendChild(star);
+                }
+            } else {
+                // Remove stars
+                document.querySelectorAll('.star').forEach(star => star.remove());
+            }
+        });
+
+        // Hydration Tracker
+        const waterTracker = document.getElementById('water-tracker');
+        for(let i = 0; i < 8; i++) {
+            const cup = document.createElement('div');
+            cup.innerHTML = '<i class="bi bi-droplet text-2xl water-drop"></i>';
+            cup.addEventListener('click', function() {
+                this.querySelector('i').classList.toggle('text-blue-500');
+            });
+            waterTracker.appendChild(cup);
+        }
+
+        // Task List
+        const tasks = [
+            { text: 'Take vitamins', completed: false },
+            { text: 'Drink water', completed: false },
+            { text: 'Exercise', completed: false }
+        ];
+
+        function renderTasks() {
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '';
+            tasks.forEach((task, index) => {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'flex items-center gap-2 p-2 bg-gray-50 rounded';
+                taskElement.innerHTML = `
+                    <input type="checkbox" ${task.completed ? 'checked' : ''}>
+                    <span class="${task.completed ? 'line-through' : ''}">${task.text}</span>
+                `;
+                taskElement.querySelector('input').addEventListener('change', () => toggleTask(index));
+                taskList.appendChild(taskElement);
+            });
+        }
+
+        function toggleTask(index) {
+            tasks[index].completed = !tasks[index].completed;
+            renderTasks();
+            updateHearts();
+        }
+
+        function updateHearts() {
+            const completedTasks = tasks.filter(task => task.completed).length;
+            document.getElementById('heart-count').textContent = completedTasks;
+        }
+
+        renderTasks();
+
+        // Chat functionality
+        const chatInput = document.getElementById('chat-input');
+        const chatContainer = document.getElementById('chat-container');
+
+        chatInput.addEventListener('keypress', function(e) {
+            if(e.key === 'Enter' && this.value.trim()) {
+                addMessage(this.value, 'user');
+                setTimeout(() => {
+                    addMessage(getBavneetResponse(), 'bavneet');
+                }, 1000);
+                this.value = '';
+            }
+        });
+
+        function addMessage(text, sender) {
+            const message = document.createElement('div');
+            message.className = `chat-bubble ${sender === 'user' ? 'ml-auto bg-pink-100' : 'bg-blue-100'} rounded-lg p-3 mb-2 max-w-[80%]`;
+            message.textContent = text;
+            chatContainer.appendChild(message);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function getBavneetResponse() {
+            const responses = [
+                "Sohniye, you're doing great! 😊",
+                "Mere dil da tu raja! Keep smiling! 💕",
+                "Koi gal nahi, everything will be fine! 🌟",
+                "Tu meri jaan hai! I'm always here for you! ❤️"
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
